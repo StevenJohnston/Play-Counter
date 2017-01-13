@@ -1,22 +1,32 @@
-var script = document.createElement('script');script.src = "https://ajax.googleapis.com/ajax/libs/jquery/2.2.0/jquery.min.js";document.getElementsByTagName('head')[0].appendChild(script);
-var songcount, cSong =0, total = 0,min = 0 ,sec = 0;
+var songcount, cSong =0, total = 0,min = 0 ,sec = 0, rowHeight =0, lastLoadedSong;
+table = document.querySelector('tbody');
+songcount = table.getAttribute('data-count');
+lastLoadedSong = table.getAttribute('data-end-index');
+rows = document.querySelectorAll('.song-row');
+height = rows[1].offsetTop - rows[0].offsetTop;
+cSong =0;
+total = 0;
 var oneAtATime = function()
 {
-  var listens = parseInt($('[data-index="'+cSong+'"]').find('[data-col="play-count"]').find("span").html());
+  var listens = parseInt(document.querySelector('[data-index="'+cSong+'"]').querySelector('[data-col="play-count"]').querySelector("span").innerHTML);
   if(!isNaN(listens))
   {
     total += listens;
-    var time = $('[data-index="'+cSong+'"]').find('[data-col="duration"]').find("span").html().split(':');
+    var time = document.querySelector('[data-index="'+cSong+'"]').querySelector('[data-col="duration"]').querySelector("span").innerHTML.split(':');
     min += parseInt(time[0])*listens;
     sec += parseInt(time[1])*listens;
   }
   cSong++;
-  if(cSong < songcount)
+  if(cSong < songcount && cSong == lastLoadedSong)
   {
-    $('#mainContainer').scrollTop(cSong*64-128);
+    document.querySelector('#mainContainer').scrollTop = cSong*height;
     setTimeout(function(){
+    lastLoadedSong = table.getAttribute('data-end-index');
       oneAtATime();
-    },0);
+    },10);
+  }
+  else if(cSong != lastLoadedSong){
+    oneAtATime();
   }
   else {
     console.log("total play count is:" + total);
@@ -31,9 +41,5 @@ var oneAtATime = function()
     console.log("days:"+ days+ ' hour:'+ hour+ ' min:' + min+" sec:"+sec);
   }
 }
-setTimeout(function(){
-  songcount = $('tbody').data('count');
-  cSong =0;
-  total = 0;
-  oneAtATime();
-},5000);
+
+oneAtATime();
