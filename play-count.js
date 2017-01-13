@@ -10,7 +10,7 @@ var oneAtATime = function()
 {
   var row = document.querySelector('[data-index="'+cSong+'"]');
   var albumId = row.querySelector('[data-col="album"]').getAttribute("data-matched-id");
-  var albumName = row.querySelector('[data-col="album"]').querySelector('span').querySelector('a').innerHTML;
+  let albumName = row.querySelector('[data-col="album"]').querySelector('span').querySelector('a').innerHTML;
   var listens = parseInt(row.querySelector('[data-col="play-count"]').querySelector("span").innerHTML);
   if(!isNaN(listens))
   {
@@ -18,7 +18,10 @@ var oneAtATime = function()
     var time = document.querySelector('[data-index="'+cSong+'"]').querySelector('[data-col="duration"]').querySelector("span").innerHTML.split(':');
     min += parseInt(time[0])*listens;
     sec += parseInt(time[1])*listens;
-
+    if (!albumId) {
+      albumId = "UNKNOW_ALBUM";
+      albumName = "UNKNOW_ALBUM";
+    }
     if(!(albumId in albums))
     {
       albums[albumId] = {
@@ -29,8 +32,8 @@ var oneAtATime = function()
       };
     }
     albums[albumId]['playcount'] += listens;
-    albums[albumId]['sec'] += sec;
-    albums[albumId]['min'] += min;
+    albums[albumId]['sec'] += parseInt(time[1])*listens
+    albums[albumId]['min'] += parseInt(time[0])*listens;
   }
 
 
@@ -57,6 +60,7 @@ var oneAtATime = function()
     days += Math.floor(hour/24);
     hour = hour%24;
     console.log("days:"+ days+ ' hour:'+ hour+ ' min:' + min+" sec:"+sec);
+    
     albumsArray = Object.keys(albums).map(function(key){
       var album = albums[key];
       album['min'] += Math.floor(album['sec']/60);
